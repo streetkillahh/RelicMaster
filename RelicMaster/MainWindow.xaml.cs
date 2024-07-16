@@ -1,24 +1,32 @@
-﻿using System.Text;
+﻿using Microsoft.Extensions.DependencyInjection;
+using RelicMaster.DAL;
+using RelicMaster.Domain.Entity;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace RelicMaster
+namespace RelicMaster;
+
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private readonly ApplicationDbContext _context;
+
+    public MainWindow(ApplicationDbContext context)
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        _context = context;
+
+        // Adding a sample relic
+        var relic = new Relic { Name = "Sample Relic", Price = 9.99m };
+        _context.Relics.Add(relic);
+        _context.SaveChanges();
+
+        // Fetching all relics
+        var relics = _context.Relics.ToList();
+        DataContext = new MainViewModel { Relics = relics };
     }
+}
+
+public class MainViewModel
+{
+    public List<Relic> Relics { get; set; }
 }
